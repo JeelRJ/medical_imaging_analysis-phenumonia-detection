@@ -1,0 +1,283 @@
+:root {
+    --primary-blue: #2563eb;
+    --secondary-blue: #3b82f6;
+    --medical-bg: #f8fafc;
+    --white: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-light: #e2e8f0;
+    --success-green: #10b981;
+    --warning-orange: #f59e0b;
+    --error-red: #ef4444;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--medical-bg);
+    color: var(--text-main);
+    line-height: 1.5;
+}
+
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background-color: var(--white);
+    border-right: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--primary-blue);
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 3rem;
+    padding-left: 0.5rem;
+}
+
+.nav-links {
+    list-style: none;
+    flex-grow: 1;
+}
+
+.nav-links li {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.nav-links li:hover, .nav-links li.active {
+    background-color: #eff6ff;
+    color: var(--primary-blue);
+}
+
+/* Main Content */
+.main-content {
+    flex-grow: 1;
+    padding: 2.5rem;
+    overflow-y: auto;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+}
+
+header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: var(--text-muted);
+}
+
+/* Dashboard Grid */
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 2rem;
+}
+
+.card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--medical-bg);
+}
+
+.card-header h3 {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+/* Upload Area */
+.upload-zone {
+    border: 2px dashed var(--border-light);
+    border-radius: 12px;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.upload-zone:hover {
+    border-color: var(--primary-blue);
+}
+
+.upload-zone i {
+    font-size: 2.5rem;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+/* Results Content */
+.clinical-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.results-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Medical Gauges & Charts */
+.gauge-container {
+    height: 180px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gauge-label {
+    position: absolute;
+    bottom: 20px;
+    text-align: center;
+}
+
+.gauge-label span {
+    display: block;
+}
+
+.label-value { font-size: 1.5rem; font-weight: 700; }
+.label-text { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+
+/* Heatmap Overlay Container */
+.heatmap-overlay-wrapper {
+    position: relative;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+}
+
+.original-xray {
+    width: 100%;
+    display: block;
+}
+
+.heatmap-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    mix-blend-mode: color; /* Essential for diagnostic-style overlay */
+    opacity: 0.7;
+}
+
+/* Clinical Summary Badges */
+.summary-data {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.summary-item:last-child { border-bottom: none; }
+
+.s-label { font-size: 0.85rem; color: var(--text-muted); }
+.s-value { font-weight: 600; font-size: 0.9rem; }
+
+.diagnosis-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.badge-pneumonia { background: #fee2e2; color: var(--error-red); }
+.badge-normal { background: #dcfce7; color: var(--success-green); }
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid var(--border-light);
+    transition: all 0.2s;
+}
+
+.btn-primary { background: var(--primary-blue); color: white; border: none; }
+.btn-primary:hover { background: var(--secondary-blue); }
+
+.hidden { display: none !important; }
+
+/* Loader */
+.medical-loader {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--medical-bg);
+    border-top: 3px solid var(--primary-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+}

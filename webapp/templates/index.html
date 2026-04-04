@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Portal | PneumoScan AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-square-h"></i>
+                <span>PneumoScan AI</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" id="nav-diag"><i class="fa-solid fa-stencil"></i> Diagnostic Tab</li>
+                <li id="nav-records"><i class="fa-solid fa-folder-medical"></i> Patient History</li>
+                <li id="nav-analytics"><i class="fa-solid fa-chart-line"></i> Lab Analytics</li>
+            </ul>
+            <div class="user-profile" style="margin-top: auto; padding: 1rem; border-top: 1px solid var(--border-light); display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 32px; height: 32px; background: var(--primary-blue); color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;">DR</div>
+                <div style="font-size: 0.85rem;">
+                    <span style="display: block; font-weight: 600;">Dr. Alexander</span>
+                    <a href="{{ url_for('logout') }}" style="font-size: 0.75rem; color: var(--error-red); text-decoration: none;">Sign Out</a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <header>
+                <div>
+                    <h1>Radiology Intelligence</h1>
+                    <span class="subtitle">AI-Powered Chest X-Ray Diagnostic Engine</span>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="document.getElementById('file-input').click()"><i class="fa-solid fa-plus"></i> NEW DIAGNOSIS</button>
+                    <input type="file" id="file-input" hidden accept=".png,.jpg,.jpeg">
+                </div>
+            </header>
+
+            <div id="diagnostic-tab">
+                <div class="dashboard-layout">
+                    <!-- Left: Upload & Image Control -->
+                    <div class="workspace-panel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-images"></i> IMAGE ACQUISITION</h3>
+                            </div>
+                            <div class="upload-zone" id="drop-zone">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <p style="font-weight: 600;">Drop DICOM/JPG File</p>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">Standard Chest AP/PA View</p>
+                            </div>
+                            <div id="preview-container" class="hidden" style="margin-top: 1.5rem;">
+                                <div class="heatmap-overlay-wrapper">
+                                    <img src="" id="preview-img" class="original-xray" alt="Uploaded X-Ray">
+                                    <canvas id="heatmap-canvas" class="heatmap-canvas"></canvas>
+                                </div>
+                                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                    <button class="btn btn-primary" style="flex: 1;" id="analyze-btn">RUN DIAGNOSIS</button>
+                                    <button class="btn" id="clear-btn"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-user-pen"></i> PATIENT METADATA</h3>
+                            </div>
+                            <div class="form-group" style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                                <input type="text" id="patient-name" placeholder="Patient Full Name" style="padding: 0.6rem; border: 1px solid var(--border-light); border-radius: 4px;">
+                                <input type="number" id="patient-age" placeholder="Age" style="padding: 0.6rem; border: 1px solid var(--border-light); border-radius: 4px;">
+                            </div>
+                            <select id="disease-type" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-light); border-radius: 4px; background: white;">
+                                <option value="Pneumonia">Screening: Pneumonia (CNN)</option>
+                                <option value="COVID-19">Screening: COVID-19 (ResNet)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Right: Analysis Results -->
+                    <div class="results-column">
+                        <!-- Clinical Results (Hidden until analyzed) -->
+                        <div id="results-placeholder" class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-muted);">
+                            <i class="fa-solid fa-stethoscope" style="font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                            <p>Upload radiological data to begin analysis</p>
+                        </div>
+
+                        <div id="results-display" class="hidden">
+                            <div class="card" style="background: linear-gradient(135deg, var(--white) 0%, #eff6ff 100%);">
+                                <div class="card-header" style="border: none; margin-bottom: 0;">
+                                    <h3>CLINICAL INTERPRETATION</h3>
+                                    <span class="diagnosis-badge" id="diag-badge-main">NORMAL</span>
+                                </div>
+                                <div style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;" id="diag-text-main">--</div>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);" id="last-updated">Analyzed Today at 12:00 PM</p>
+                            </div>
+
+                            <div class="clinical-grid">
+                               <!-- Severity Gauge -->
+                               <div class="card">
+                                   <div class="card-header"><h3>INFILTRATE SEVERITY</h3></div>
+                                   <div class="gauge-container">
+                                       <canvas id="severity-gauge"></canvas>
+                                       <div class="gauge-label">
+                                           <span id="severity-value-text" class="label-value">0%</span>
+                                           <span id="severity-level-text" class="label-text">MILD</span>
+                                       </div>
+                                   </div>
+                               </div>
+
+                               <!-- Probability Bar -->
+                               <div class="card">
+                                   <div class="card-header"><h3>SYSTEM CONFIDENCE</h3></div>
+                                   <div style="height: 180px;">
+                                       <canvas id="prob-chart"></canvas>
+                                   </div>
+                               </div>
+                            </div>
+
+                            <div class="clinical-grid">
+                                <!-- Infection Area & Comparison -->
+                                <div class="card">
+                                    <div class="card-header"><h3>LUNG FIELD ANALYSIS</h3></div>
+                                    <div style="height: 180px;">
+                                        <canvas id="lung-comparison-chart"></canvas>
+                                    </div>
+                                    <div style="margin-top: 1rem; text-align: center; border-radius: 8px; background: var(--medical-bg); padding: 0.75rem;">
+                                        <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Total Infection Area</span>
+                                        <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary-blue);" id="infection-area-text">4.2%</div>
+                                    </div>
+                                </div>
+
+                                <!-- Summary Panel -->
+                                <div class="card">
+                                    <div class="card-header"><h3>CLINICAL SUMMARY</h3></div>
+                                    <div class="summary-data">
+                                        <div class="summary-item">
+                                            <span class="s-label">Diagnosis</span>
+                                            <span class="s-value" id="summary-diag">Normal</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="s-label">Confidence</span>
+                                            <span class="s-value" id="summary-conf">98.5%</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="s-label">Affected Region</span>
+                                            <span class="s-value" id="summary-region">None</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <span class="s-label">Recommendation</span>
+                                            <span class="s-value" id="summary-rec" style="color: var(--primary-blue);">No Immediate Action</span>
+                                        </div>
+                                    </div>
+                                    <a id="report-download-btn" href="#" target="_blank" class="btn btn-primary" style="width: 100%; margin-top: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none;">
+                                        <i class="fa-solid fa-file-pdf"></i> EXPORT RADIOLOGY REPORT
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient History Tab -->
+            <div id="records-tab" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-clock-rotate-left"></i> RECENT DIAGNOSTIC LOGS</h3>
+                    </div>
+                    <div class="table-container" style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                            <thead>
+                                <tr style="text-align: left; border-bottom: 1px solid var(--border-light);">
+                                    <th style="padding: 1rem; font-size: 0.8rem; color: var(--text-muted);">PATIENT ID</th>
+                                    <th style="padding: 1rem; font-size: 0.8rem; color: var(--text-muted);">NAME</th>
+                                    <th style="padding: 1rem; font-size: 0.8rem; color: var(--text-muted);">STATUS</th>
+                                    <th style="padding: 1rem; font-size: 0.8rem; color: var(--text-muted);">SCAN DATE</th>
+                                    <th style="padding: 1rem; font-size: 0.8rem; color: var(--text-muted);">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patients-table-body">
+                                <!-- Loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lab Analytics Tab -->
+            <div id="analytics-tab" class="hidden">
+                <div class="clinical-grid">
+                    <div class="card">
+                        <div class="card-header"><h3>DAILY SCAN VOLUME</h3></div>
+                        <div style="height: 250px;"><canvas id="volumeChart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3>SYSTEM DIAGNOSTIC ACCURACY</h3></div>
+                        <div style="height: 250px;"><canvas id="accuracyChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header"><h3>DIAGNOSIS DISTRIBUTION</h3></div>
+                    <div style="height: 300px;"><canvas id="distributionChart"></canvas></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="medical-loader"></div>
+        <p style="margin-top: 1rem; font-weight: 600; color: var(--primary-blue);">Radiological Feature Analysis...</p>
+        <p style="font-size: 0.75rem; color: var(--text-muted);">Predicting pneumonia biomarkers with Deep Learning</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
