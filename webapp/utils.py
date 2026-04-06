@@ -17,6 +17,18 @@ except ImportError:
 from fpdf import FPDF
 from datetime import datetime
 
+def medical_clahe_preprocessing(img_array):
+    """Apply CLAHE to enhance lung detail for consistency with training."""
+    if not CV2_AVAILABLE:
+        return img_array
+    
+    # Input is expected to be [0, 1] scaled, 150x150x3
+    img_uint8 = (img_array * 255).astype('uint8')
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    for i in range(3):
+        img_uint8[:,:,i] = clahe.apply(img_uint8[:,:,i])
+    return img_uint8.astype('float32') / 255.0
+
 def generate_grad_cam(model, img_array, intensity=0.5, res=250):
     """Placeholder for Grad-CAM logic. In Demo, we mock the heatmap."""
     if not CV2_AVAILABLE:

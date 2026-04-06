@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Chart Handles
     let charts = {
-        severity: null,
         probability: null,
         comparison: null,
         volume: null,
@@ -47,34 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
     navAnalytics.onclick = () => switchTab(navAnalytics, analyticsTab);
 
     // --- CHART INITIALIZATION (Diagnostic) ---
-    function initSeverityGauge(value, level) {
-        const ctx = document.getElementById('severity-gauge').getContext('2d');
-        if (charts.severity) charts.severity.destroy();
-
-        const getColor = (v) => v < 30 ? '#10b981' : v < 70 ? '#f59e0b' : '#ef4444';
-        
-        charts.severity = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [value, 100 - value],
-                    backgroundColor: [getColor(value), '#f1f5f9'],
-                    borderWidth: 0,
-                    circumference: 180,
-                    rotation: 270
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '80%',
-                plugins: { legend: { display: false }, tooltip: { enabled: false } }
-            }
-        });
-
-        document.getElementById('severity-value-text').textContent = `${value}%`;
-        document.getElementById('severity-level-text').textContent = level;
-    }
 
     function initProbChart(normal, pneumonia) {
         const ctx = document.getElementById('prob-chart').getContext('2d');
@@ -300,7 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('summary-rec').textContent = data.suggestion;
         document.getElementById('report-download-btn').href = data.report_url;
 
-        initSeverityGauge(data.confidence > 50 ? 82 : 12, data.severity);
         initProbChart(data.label === 'NORMAL' ? data.confidence : 100 - data.confidence, 
                       data.label === 'PNEUMONIA' ? data.confidence : 100 - data.confidence);
         initComparisonChart(data.left_lung || 15, data.right_lung || 45); 

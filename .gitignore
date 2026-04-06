@@ -1,5 +1,5 @@
 # Data and Large Files
-data/
+data/   
 output/*
 !output/models/
 output/models/*
