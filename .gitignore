@@ -5,30 +5,11 @@ output/*
 output/models/*
 !output/models/pneumonia_model.keras
 
-# Virtual Environments
+# Python dependencies and environments
 .venv/
-venv/
-venv_new/
-env/
-ENV/
-
-# Python cache
 __pycache__/
-*.py[cod]
-*$py.class
+webapp/__pycache__/
 
-# Database
-webapp/instance/
-webapp/database.db
-
-# Uploads and reports (generated data)
-webapp/uploads/*
-webapp/reports/*
-webapp/static/heatmaps/*
-!webapp/uploads/.gitkeep
-!webapp/reports/.gitkeep
-!webapp/static/heatmaps/.gitkeep
-
-# OS specific
-.DS_Store
-Thumbs.db
+# Application uploads and heatmaps
+webapp/uploads/
+webapp/static/heatmaps/
